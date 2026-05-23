@@ -42,8 +42,8 @@ public class Skarbiec {
     }
     //TODO : Wydawanie reszty niech uwzglednia jakie ma monety
     public static List<Nominal> obliczOptymalnaReszte(double resztaDoWydania){
-        List<Nominal> monetyReszta = obliczWrzut(resztaDoWydania);
-        return monetyReszta;
+        //List<Nominal> monetyReszta = obliczWrzut(resztaDoWydania);
+        return obliczWrzut(resztaDoWydania);
     }
 
     public void wydajMonety(List<Nominal> monetyDoWydania) {
