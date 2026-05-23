@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Skarbiec {
-    public Map<Nominal,Integer> monety;
+    private Map<Nominal,Integer> monety;
 
     void zaladujStartowe(int ilosc){
         this.monety = new HashMap<>();
@@ -12,7 +12,7 @@ public class Skarbiec {
             this.monety.put(nominal, ilosc);
         }
     }
-    public static List<Nominal> obliczWrzut(double wrzucone){
+    private static List<Nominal> obliczWrzut(double wrzucone){
         List<Nominal> obliczonyWrzut = new ArrayList<>();
         int wrzuconeGrosze = (int) (wrzucone *100);
         int monetaObliczanaWGroszach = 0;
