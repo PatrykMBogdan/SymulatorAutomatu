@@ -6,13 +6,17 @@ import java.util.Map;
 public class Skarbiec {
     private Map<Nominal,Integer> monety;
 
+    public Map<Nominal, Integer> getMonety() {
+        return monety;
+    }
+
     void zaladujStartowe(int ilosc){
         this.monety = new HashMap<>();
         for(Nominal nominal : Nominal.values()){
             this.monety.put(nominal, ilosc);
         }
     }
-    private static List<Nominal> obliczWrzut(double wrzucone){
+    public List<Nominal> obliczWrzut(double wrzucone){
         List<Nominal> obliczonyWrzut = new ArrayList<>();
         int wrzuconeGrosze = (int) (wrzucone *100);
         int monetaObliczanaWGroszach = 0;
@@ -41,9 +45,9 @@ public class Skarbiec {
         }
     }
     //TODO : Wydawanie reszty niech uwzglednia jakie ma monety
-    public static List<Nominal> obliczOptymalnaReszte(double resztaDoWydania){
+    public List<Nominal> obliczOptymalnaReszte(double resztaDoWydania){
         //List<Nominal> monetyReszta = obliczWrzut(resztaDoWydania);
-        return obliczWrzut(resztaDoWydania);
+        return this.obliczWrzut(resztaDoWydania);
     }
 
     public void wydajMonety(List<Nominal> monetyDoWydania) {
