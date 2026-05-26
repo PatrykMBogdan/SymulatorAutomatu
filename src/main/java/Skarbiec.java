@@ -18,7 +18,7 @@ public class Skarbiec {
     }
     public List<Nominal> obliczWrzut(double wrzucone){
         List<Nominal> obliczonyWrzut = new ArrayList<>();
-        int wrzuconeGrosze = (int) (wrzucone *100);
+        int wrzuconeGrosze = (int) Math.round(wrzucone *100);
         int monetaObliczanaWGroszach = 0;
         for(Nominal nominal : Nominal.values()){
             switch (nominal){
@@ -55,6 +55,15 @@ public class Skarbiec {
             int obecnaIlosc = monety.getOrDefault(wrzuconaMoneta, 0);
             this.monety.put(wrzuconaMoneta, obecnaIlosc - 1);
         }
+    }
 
+    public double przeliczNaKwote(Map<Nominal, Integer> monety){
+        double suma = 0;
+        for(Map.Entry<Nominal, Integer> nominal : this.monety.entrySet()){
+            Nominal moneta = nominal.getKey();
+            int iloscSztuk = nominal.getValue();
+            suma += moneta.getWartosc() * iloscSztuk;
+        }
+        return Math.round(suma * 100)/100.0;
     }
 }

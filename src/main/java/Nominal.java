@@ -1,8 +1,19 @@
 public enum Nominal {
-    PLN_5_00,
-    PLN_2_00,
-    PLN_1_00,
-    GR_50,
-    GR_20,
-    GR_10
+    PLN_5_00(5.0),
+    PLN_2_00(2.0),
+    PLN_1_00(1.0),
+    GR_50(0.5),
+    GR_20(0.2),
+    GR_10(0.1);
+
+    private final double wartosc;
+
+    Nominal(double wartosc){
+        this.wartosc = wartosc;
+    }
+
+    public double getWartosc(){
+        return this.wartosc;
+    }
 }
+

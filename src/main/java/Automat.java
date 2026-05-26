@@ -1,9 +1,7 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.RandomAccess;
+import java.util.*;
 import java.util.random.RandomGenerator;
 import java.util.random.RandomGeneratorFactory;
+import java.util.stream.Collectors;
 
 public class Automat {
     private int czestotliwoscDostaw;
@@ -44,18 +42,20 @@ public class Automat {
         switch (region){
             case UBOGI -> sredniaKwota = 3;
             case SREDNI -> sredniaKwota = 5;
-            case BOGATY -> sredniaKwota = 10;
+            case BOGATY -> sredniaKwota = 12;
             default -> sredniaKwota = 10;
         }
         for(int i = 0; i < iloscProb; i++){
-            if(i == automat.czestotliwoscDostaw)
-                for(int j = 0 ; j<listaProduktow.size(); j++) listaProduktow.get(i).uzupelnijDoPelna();
+            if(i > 0 && i % automat.czestotliwoscDostaw == 0)
+                for(int j = 0 ; j<listaProduktow.size(); j++) listaProduktow.get(j).uzupelnijDoPelna();
             Produkt wylosowanyProdukt = wylosujProdukt();
             automat.listaTransakcji.add(automat.sprobujKupic(wylosowanyProdukt, sredniaKwota));
             if(automat.listaTransakcji.getLast().czyUdaloSie()){
                 skarbiec.dodajMonetyWrzut(skarbiec.obliczWrzut(sredniaKwota));
                 skarbiec.wydajMonety(skarbiec.obliczOptymalnaReszte(sredniaKwota - wylosowanyProdukt.getCena()));
+                automat.sprzedaneProdukty++;
             }
+            else automat.nieudaneTransakcje++;
 
         }
         automat.generujPodsumowanie(skarbiec, automat);
@@ -70,7 +70,8 @@ public class Automat {
     }
 
     public void generujPodsumowanie(Skarbiec skarbiec, Automat automat){
-        System.out.println(skarbiec.getMonety());
-        System.out.println(automat.sprzedaneProdukty);
+        System.out.println(skarbiec.przeliczNaKwote(skarbiec.getMonety()));
+        Map<StatusTransakcji, Long> iloscPoStatusie = automat.listaTransakcji.stream().collect(Collectors.groupingBy(Transakcja::getStatus, Collectors.counting()));
+        System.out.println(iloscPoStatusie);
     }
 }
