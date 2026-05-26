@@ -29,7 +29,7 @@ public class Skarbiec {
                 wrzuconeGrosze -= monetaObliczanaWGroszach;
                 obliczonyWrzut.add(nominal);
             }
-            if(wrzucone <= 0) return obliczonyWrzut;
+            if(wrzuconeGrosze <= 0) return obliczonyWrzut;
         }
         return obliczonyWrzut;
     }
