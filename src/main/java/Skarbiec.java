@@ -46,8 +46,32 @@ public class Skarbiec {
     }
     //TODO : Wydawanie reszty niech uwzglednia jakie ma monety
     public List<Nominal> obliczOptymalnaReszte(double resztaDoWydania){
-        //List<Nominal> monetyReszta = obliczWrzut(resztaDoWydania);
-        return this.obliczWrzut(resztaDoWydania);
+        List<Nominal> wydawanaReszta = new ArrayList<>();
+
+        int resztaWGroszach = (int) Math.round(resztaDoWydania*100);
+        int wartoscMonetyWGroszach = 0;
+        for(Nominal nominal : Nominal.values()){
+            switch (nominal){
+                case PLN_5_00 -> wartoscMonetyWGroszach = 500;
+                case PLN_2_00 -> wartoscMonetyWGroszach = 200;
+                case PLN_1_00 -> wartoscMonetyWGroszach = 100;
+                case GR_50 -> wartoscMonetyWGroszach = 50;
+                case GR_20 -> wartoscMonetyWGroszach = 20;
+                case GR_10 -> wartoscMonetyWGroszach = 10;
+            }
+            int dostepneMonety = this.monety.getOrDefault(nominal, 0);
+            int potrzebneMonety = resztaWGroszach / wartoscMonetyWGroszach;
+            int ileWydac = Math.min(dostepneMonety,potrzebneMonety);
+
+            for(int i=0;i<ileWydac;i++){
+                wydawanaReszta.add(nominal);
+                resztaWGroszach = resztaWGroszach - wartoscMonetyWGroszach;
+            }
+            if(resztaWGroszach==0){
+                break;
+            }
+        }
+        return wydawanaReszta;
     }
 
     public void wydajMonety(List<Nominal> monetyDoWydania) {
