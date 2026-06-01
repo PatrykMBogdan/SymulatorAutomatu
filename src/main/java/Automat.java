@@ -73,5 +73,6 @@ public class Automat {
         System.out.println(skarbiec.przeliczNaKwote(skarbiec.getMonety()));
         Map<StatusTransakcji, Long> iloscPoStatusie = automat.listaTransakcji.stream().collect(Collectors.groupingBy(Transakcja::getStatus, Collectors.counting()));
         System.out.println(iloscPoStatusie);
+        System.out.println("Stan szufladek po dniu pracy: " + skarbiec.getMonety());
     }
 }
