@@ -22,10 +22,18 @@ public class Automat {
     }
 
     private static void dodajTestoweProdukty(){
-        listaProduktow.add(new Produkt("CocaCola", 3.9, 12));
-        listaProduktow.add(new Produkt("Pepsi", 4.9, 10));
-        listaProduktow.add(new Produkt("Fajny Wafel", 2, 22));
-        listaProduktow.add(new Produkt("Kupon na talon", 12, 4));
+        listaProduktow.add(new Produkt("Coca-Cola 0.5l", 4.5, 15));
+        listaProduktow.add(new Produkt("Pepsi 0.5l", 4.5, 15));
+        listaProduktow.add(new Produkt("Woda Niegazowana 0.5l", 3.0, 20));
+        listaProduktow.add(new Produkt("Woda Gazowana 0.5l", 3.0, 20));
+        listaProduktow.add(new Produkt("Baton Snickers", 3.5, 25));
+        listaProduktow.add(new Produkt("Baton Mars", 3.5, 25));
+        listaProduktow.add(new Produkt("Baton Twix", 3.5, 25));
+        listaProduktow.add(new Produkt("Rogalik 7Days", 4.0, 10));
+        listaProduktow.add(new Produkt("Chipsy Lays Paprykowe", 5.5, 8));
+        listaProduktow.add(new Produkt("Chipsy Lays Solone", 5.5, 8));
+        listaProduktow.add(new Produkt("Paluszki Beskidzkie", 3.0, 12));
+        listaProduktow.add(new Produkt("Zelki Haribo", 4.5, 15));
     }
 
     private void sprawdzDostawy(int numerKlienta){
@@ -79,11 +87,17 @@ public class Automat {
     public Transakcja sprobujKupic(Produkt produkt, double wrzuconaKwota, Skarbiec skarbiec) {
         if (!produkt.czyDostepny()) return new Transakcja(StatusTransakcji.BRAK_PRODUKTU, wrzuconaKwota);
         if (wrzuconaKwota < produkt.getCena()) return new Transakcja(StatusTransakcji.ZA_MALO_GOTOWKI, wrzuconaKwota);
-        if (skarbiec.przeliczNaKwote(skarbiec.obliczOptymalnaReszte(wrzuconaKwota - produkt.getCena())) != (wrzuconaKwota - produkt.getCena())) return new Transakcja(StatusTransakcji.NIE_MA_JAK_WYDAC, wrzuconaKwota);
+
+        double oczekiwanaReszta = Math.round((wrzuconaKwota - produkt.getCena()) * 100) / 100.0;
+        double resztaZeSkarbca = skarbiec.przeliczNaKwote(skarbiec.obliczOptymalnaReszte(oczekiwanaReszta));
+
+        if (resztaZeSkarbca != oczekiwanaReszta) {
+            return new Transakcja(StatusTransakcji.NIE_MA_JAK_WYDAC, wrzuconaKwota);
+        }
+
         produkt.zmniejszIlosc();
         return new Transakcja(StatusTransakcji.UDANA, wrzuconaKwota);
     }
-
     public void generujPodsumowanie(Skarbiec skarbiec, Automat automat){
         System.out.println("\n==================================================");
         System.out.println("      RAPORT DZIENNY Z SYMULACJI AUTOMATU     ");
