@@ -37,7 +37,7 @@ public class Automat {
     }
     public Automat(Region poziomZamoznosci, int dostawyCo){
         this.poziomZamoznosci = poziomZamoznosci;
-        this.czestotliwoscDostaw = dostawyCo;
+        this.czestotliwoscDostaw =  dostawyCo;
     }
     public static void uruchomSymulacje(int iloscProb, Region region, int dostawyCo, int StartoweMonety){
         Automat automat = new Automat(region, dostawyCo);
@@ -64,7 +64,7 @@ public class Automat {
                 }
                 default -> wrzuconaKwota = 10.0;
             }
-            automat.listaTransakcji.add(automat.sprobujKupic(wylosowanyProdukt, wrzuconaKwota));
+            automat.listaTransakcji.add(automat.sprobujKupic(wylosowanyProdukt, wrzuconaKwota, skarbiec));
             if(automat.listaTransakcji.getLast().czyUdaloSie()){
                 skarbiec.dodajMonetyWrzut(skarbiec.obliczWrzut(wrzuconaKwota));
                 skarbiec.wydajMonety(skarbiec.obliczOptymalnaReszte(wrzuconaKwota - wylosowanyProdukt.getCena()));
@@ -76,13 +76,12 @@ public class Automat {
         }
         automat.generujPodsumowanie(skarbiec, automat);
     }
-    public Transakcja sprobujKupic(Produkt produkt, double wrzuconaKwota){
-        if(!produkt.czyDostepny()) return new Transakcja(StatusTransakcji.BRAK_PRODUKTU, wrzuconaKwota);
-        if(wrzuconaKwota >= produkt.getCena()){
-            produkt.zmniejszIlosc();
-            return new Transakcja(StatusTransakcji.UDANA, wrzuconaKwota);
-        }
-        else return new Transakcja(StatusTransakcji.ZA_MALO_GOTOWKI, wrzuconaKwota);
+    public Transakcja sprobujKupic(Produkt produkt, double wrzuconaKwota, Skarbiec skarbiec) {
+        if (!produkt.czyDostepny()) return new Transakcja(StatusTransakcji.BRAK_PRODUKTU, wrzuconaKwota);
+        if (wrzuconaKwota < produkt.getCena()) return new Transakcja(StatusTransakcji.ZA_MALO_GOTOWKI, wrzuconaKwota);
+        if (skarbiec.przeliczNaKwote(skarbiec.obliczOptymalnaReszte(wrzuconaKwota - produkt.getCena())) != (wrzuconaKwota - produkt.getCena())) return new Transakcja(StatusTransakcji.NIE_MA_JAK_WYDAC, wrzuconaKwota);
+        produkt.zmniejszIlosc();
+        return new Transakcja(StatusTransakcji.UDANA, wrzuconaKwota);
     }
 
     public void generujPodsumowanie(Skarbiec skarbiec, Automat automat){
@@ -112,10 +111,12 @@ public class Automat {
         long udane = iloscPoStatusie.getOrDefault(StatusTransakcji.UDANA, 0L);
         long zaMaloHajsu = iloscPoStatusie.getOrDefault(StatusTransakcji.ZA_MALO_GOTOWKI, 0L);
         long brakTowaru = iloscPoStatusie.getOrDefault(StatusTransakcji.BRAK_PRODUKTU, 0L);
+        long nieMaJakWydac = iloscPoStatusie.getOrDefault(StatusTransakcji.NIE_MA_JAK_WYDAC, 0L);
 
         System.out.println("  Udane transakcje (wydano towar):    " + udane);
         System.out.println("  Odrzucone (za malo gotowki):        " + zaMaloHajsu);
         System.out.println("  Odrzucone (brak towaru na polce):   " + brakTowaru);
+        System.out.println("  Odrzucone (automat nie mial jak wydac reszty):   " + nieMaJakWydac);
 
         System.out.println("\n TOP PRODUKTY (BESTSELLERY):");
         System.out.println("--------------------------------------------------");

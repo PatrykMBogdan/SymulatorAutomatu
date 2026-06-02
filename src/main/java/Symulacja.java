@@ -2,10 +2,10 @@ public class Symulacja {
     public static void main(String[] args){
         System.out.println("POCZĄTEK SYMULACJI");
 
-        int iloscProb = 100;
+        int iloscProb = 10000;
         Region region = Region.SREDNI;
-        int dostawyCo = 20;
-        int startoweMonety = 20;
+        int dostawyCo = 60;
+        int startoweMonety = 1;
 
         Automat.uruchomSymulacje(
          iloscProb,

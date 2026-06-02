@@ -44,7 +44,6 @@ public class Skarbiec {
             this.monety.put(wrzuconaMoneta, obecnaIlosc + 1);
         }
     }
-    //TODO : Wydawanie reszty niech uwzglednia jakie ma monety
     public List<Nominal> obliczOptymalnaReszte(double resztaDoWydania){
         List<Nominal> wydawanaReszta = new ArrayList<>();
 
@@ -83,11 +82,18 @@ public class Skarbiec {
 
     public double przeliczNaKwote(Map<Nominal, Integer> monety){
         double suma = 0;
-        for(Map.Entry<Nominal, Integer> nominal : this.monety.entrySet()){
+        for(Map.Entry<Nominal, Integer> nominal : monety.entrySet()){
             Nominal moneta = nominal.getKey();
             int iloscSztuk = nominal.getValue();
             suma += moneta.getWartosc() * iloscSztuk;
         }
         return Math.round(suma * 100)/100.0;
+    }
+    public double przeliczNaKwote(List<Nominal> monety){
+        double suma = 0;
+        for(Nominal moneta : monety){
+            suma += moneta.getWartosc();
+        }
+        return Math.round(suma*100.0)/100.0;
     }
 }
