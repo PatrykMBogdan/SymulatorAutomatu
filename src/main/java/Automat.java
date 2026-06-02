@@ -12,6 +12,9 @@ public class Automat {
     private static List<Produkt> listaProduktow = new ArrayList<>();
     private List<Transakcja> listaTransakcji = new ArrayList<>();
 
+    private double poczatkowyStanKasetki;
+    private Map<String, Integer> sprzedaneBestsellery = new HashMap<>();
+
     private static Produkt wylosujProdukt(){
         Random random = new Random();
         int wylosowanyIndeks = random.nextInt(listaProduktow.size());
@@ -41,6 +44,8 @@ public class Automat {
         Skarbiec skarbiec = new Skarbiec();
         skarbiec.zaladujStartowe(StartoweMonety);
         dodajTestoweProdukty();
+
+        automat.poczatkowyStanKasetki = skarbiec.przeliczNaKwote(skarbiec.getMonety());
         Random random = new Random();
 
         for(int i = 0; i < iloscProb; i++){
@@ -49,16 +54,13 @@ public class Automat {
             double wrzuconaKwota = 0;
             switch (region) {
                 case UBOGI -> {
-                    double[] mozliweKwoty = {2.0, 3.0, 4.0};
-                    wrzuconaKwota = mozliweKwoty[random.nextInt(mozliweKwoty.length)];
+                    wrzuconaKwota = random.nextInt(20, 50) / 10.0;
                 }
                 case SREDNI -> {
-                    double[] mozliweKwoty = {5.0, 6.0, 7.0, 8.0, 9.0};
-                    wrzuconaKwota = mozliweKwoty[random.nextInt(mozliweKwoty.length)];
+                    wrzuconaKwota = random.nextInt(50, 100) / 10.0;
                 }
                 case BOGATY -> {
-                    double[] mozliweKwoty = {10.0, 15.0, 20.0, 25.0, 30.0};
-                    wrzuconaKwota = mozliweKwoty[random.nextInt(mozliweKwoty.length)];
+                    wrzuconaKwota = random.nextInt(10, 31);
                 }
                 default -> wrzuconaKwota = 10.0;
             }
@@ -67,6 +69,7 @@ public class Automat {
                 skarbiec.dodajMonetyWrzut(skarbiec.obliczWrzut(wrzuconaKwota));
                 skarbiec.wydajMonety(skarbiec.obliczOptymalnaReszte(wrzuconaKwota - wylosowanyProdukt.getCena()));
                 automat.sprzedaneProdukty++;
+                automat.sprzedaneBestsellery.put(wylosowanyProdukt.getNazwa(), automat.sprzedaneBestsellery.getOrDefault(wylosowanyProdukt.getNazwa(), 0) + 1);
             }
             else automat.nieudaneTransakcje++;
 
@@ -83,9 +86,46 @@ public class Automat {
     }
 
     public void generujPodsumowanie(Skarbiec skarbiec, Automat automat){
-        System.out.println(skarbiec.przeliczNaKwote(skarbiec.getMonety()));
-        Map<StatusTransakcji, Long> iloscPoStatusie = automat.listaTransakcji.stream().collect(Collectors.groupingBy(Transakcja::getStatus, Collectors.counting()));
-        System.out.println(iloscPoStatusie);
-        System.out.println("Stan szufladek po dniu pracy: " + skarbiec.getMonety());
+        System.out.println("\n==================================================");
+        System.out.println("      RAPORT DZIENNY Z SYMULACJI AUTOMATU     ");
+        System.out.println("==================================================");
+
+        double obecnyStanKasetki = skarbiec.przeliczNaKwote(skarbiec.getMonety());
+        double zyskNetto = Math.round((obecnyStanKasetki - automat.poczatkowyStanKasetki) * 100) / 100.0;
+
+        System.out.println("\n FINANSE:");
+        System.out.println("--------------------------------------------------");
+        System.out.println(" Laczna kwota w kasetce: " + obecnyStanKasetki + " PLN");
+        System.out.println(" Zysk na czysto (utarg): " + zyskNetto + " PLN");
+        System.out.println("\n Ilosc monet w kasetce: ");
+
+        skarbiec.getMonety().forEach((nominal, ilosc) ->
+                System.out.println("   - " + nominal + ": " + ilosc + " szt.")
+        );
+
+        System.out.println("\n STATYSTYKI SPRZEDAZY:");
+        System.out.println("--------------------------------------------------");
+        Map<StatusTransakcji, Long> iloscPoStatusie = automat.listaTransakcji.stream()
+                .collect(Collectors.groupingBy(Transakcja::getStatus, Collectors.counting()));
+
+
+        long udane = iloscPoStatusie.getOrDefault(StatusTransakcji.UDANA, 0L);
+        long zaMaloHajsu = iloscPoStatusie.getOrDefault(StatusTransakcji.ZA_MALO_GOTOWKI, 0L);
+        long brakTowaru = iloscPoStatusie.getOrDefault(StatusTransakcji.BRAK_PRODUKTU, 0L);
+
+        System.out.println("  Udane transakcje (wydano towar):    " + udane);
+        System.out.println("  Odrzucone (za malo gotowki):        " + zaMaloHajsu);
+        System.out.println("  Odrzucone (brak towaru na polce):   " + brakTowaru);
+
+        System.out.println("\n TOP PRODUKTY (BESTSELLERY):");
+        System.out.println("--------------------------------------------------");
+        if (automat.sprzedaneBestsellery.isEmpty()) {
+            System.out.println("  Brak sprzedanych produktow.");
+        } else {
+            automat.sprzedaneBestsellery.entrySet().stream().sorted(Map.Entry.<String, Integer>comparingByValue().reversed()).forEach(entry -> System.out.println("  - " + entry.getKey() + ": " + entry.getValue() + " szt."));
+        }
+        System.out.println("\n==================================================");
+        System.out.println("              ZAMKNIECIE SYSTEMU                  ");
+        System.out.println("==================================================\n");
     }
 }
