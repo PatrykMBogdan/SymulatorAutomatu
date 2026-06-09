@@ -1,3 +1,9 @@
+/**
+ * Typ wyliczeniowy reprezentujący fizyczne monety obsługiwane przez automat.
+ * Przechowuje informację o rzeczywistej wartości liczbowej każdego nominału w automacie.
+ *
+ * @author Szymon Łakomy, Patryk Bogdan
+ */
 public enum Nominal {
     PLN_5_00(5.0),
     PLN_2_00(2.0),

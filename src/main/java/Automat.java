@@ -2,6 +2,11 @@ import java.util.*;
 import java.util.random.RandomGenerator;
 import java.util.random.RandomGeneratorFactory;
 import java.util.stream.Collectors;
+/**
+ * Główna klasa symulująca działanie automatu vendingowego.
+ * Zarządza listą dostępnych produktów, historią transakcji oraz przeprowadza cały proces kupowania przez klienta.
+ * * @author Szymon Łakomy, Patryk Bogdan
+ */
 
 public class Automat {
     private int czestotliwoscDostaw;
@@ -43,10 +48,24 @@ public class Automat {
             }
         }
     }
+    /**
+     * Konstruktor klasy Automat.
+     *
+     * @param poziomZamoznosci Region określający portfele klientów
+     * @param dostawyCo Liczba transakcji, po których następuje uzupełnienie towaru
+     */
     public Automat(Region poziomZamoznosci, int dostawyCo){
         this.poziomZamoznosci = poziomZamoznosci;
         this.czestotliwoscDostaw =  dostawyCo;
     }
+    /**
+     * Uruchamia główną pętlę symulacji dla ustalonej w klasie Symulacja, liczby klientów.
+     *
+     * @param iloscProb Liczba transakcji do przeprowadzenia w danej symulacji
+     * @param region Status majątkowy klientów determinujący wrzucane kwoty
+     * @param dostawyCo Co ile transakcji automat ma być uzupełniany spowrotem do pełna
+     * @param StartoweMonety Ilość sztuk każdej monety w kasetce przy rozpoczeciu symulacji
+     */
     public static void uruchomSymulacje(int iloscProb, Region region, int dostawyCo, int StartoweMonety){
         Automat automat = new Automat(region, dostawyCo);
         Skarbiec skarbiec = new Skarbiec();
@@ -84,6 +103,14 @@ public class Automat {
         }
         automat.generujPodsumowanie(skarbiec, automat);
     }
+        /**
+         * Próbuje przeprowadzić transakcję zakupu dla podanego produktu.
+         *
+         * @param produkt Wybrany produkt z maszyny
+         * @param wrzuconaKwota Kwota wrzucona przez klienta
+         * @param skarbiec Instancja skarbca do weryfikacji możliwości wydania reszty
+         * @return Obiekt transakcji zawierający status i wrzuconą kwotę
+         */
     public Transakcja sprobujKupic(Produkt produkt, double wrzuconaKwota, Skarbiec skarbiec) {
         if (!produkt.czyDostepny()) return new Transakcja(StatusTransakcji.BRAK_PRODUKTU, wrzuconaKwota);
         if (wrzuconaKwota < produkt.getCena()) return new Transakcja(StatusTransakcji.ZA_MALO_GOTOWKI, wrzuconaKwota);
@@ -98,6 +125,13 @@ public class Automat {
         produkt.zmniejszIlosc();
         return new Transakcja(StatusTransakcji.UDANA, wrzuconaKwota);
     }
+     /**
+      * Generuje i wyświetla w konsoli końcowy raport z symulacji.
+      * Wypisuje stan kasetki, zysk netto, statystyki błędów oraz listę bestsellerów.
+      *
+      * @param skarbiec Skarbiec zawierający utarg
+      * @param automat Automat posiadający statystyki sprzedaży
+      */
     public void generujPodsumowanie(Skarbiec skarbiec, Automat automat){
         System.out.println("\n==================================================");
         System.out.println("      RAPORT DZIENNY Z SYMULACJI AUTOMATU     ");
